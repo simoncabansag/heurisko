@@ -1,0 +1,13 @@
+{
+    "name": "heurisko",
+    "version": "1.0.0",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "/heurisko"
+    },
+    "author": "Simon Cabansag",
+    "type": "module"
+}
