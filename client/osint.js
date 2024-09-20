@@ -46,16 +46,55 @@ form.addEventListener("submit", (e) => {
     e.preventDefault()
 
     let url = document.getElementById("url")
-
+    let something = true
     // console.log(url.value)
-    if (isValidURL(url.value)) {
-        console.log(url.value + " is valid!")
+    // if (isValidURL(url.value)) {
+    if (something) {
+        console.log(url.value + " is valid!!")
 
+        // const url = "https://instagram.com/robots.txt"
+
+        fetch("http://127.0.0.1:3500/", {
+            method: "GET",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json;charset=UTF-8",
+            },
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`)
+                }
+                // console.log(response) // full verbose
+                return response.json()
+            })
+            .then((data) => {
+                console.log("GET request successful. Response: ", data)
+            })
+            .catch((error) => {
+                "Error:", error
+            })
+        // fetch("http://localhost:3500", {
+        //     method: "POST",
+        //     headers: {
+        //         Accept: "application/json",
+        //         "Content-Type": "application/json;charset=UTF-8",
+        //     },
+        //     body: JSON.stringify({
+        //         title: "Hello World",
+        //         body: "This is a test post.",
+        //         userId: 1,
+        //     }),
+        // })
+        //     .then((response) => response.json())
+        //     .then((data) => {
+        //         console.log("POST request successful. Response: "), data
+        //     })
         // check robots.txt file
-        fetch(url.value + "robots.txt")
-            .then((response) => response.text())
-            .then((data) => console.log(data))
+        // fetch(url.value + "robots.txt")
+        //     .then((response) => response.text())
+        //     .then((data) => console.log(data))
     } else {
-        console.log(url.value + " is NOT valid!")
+        console.log(url.value + " is NOT valid!!")
     }
 })
