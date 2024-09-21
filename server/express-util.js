@@ -99,24 +99,6 @@ const App = () => {
     }
 
     // console.log(sanitizeUrl("https://quotes.toscrape.com/page/2/", "del"))
-
-    const match1 = (url) => {
-        const http =
-            /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/gi
-        const nonHttp =
-            /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/gi
-
-        const regexHttp = new RegExp(http)
-        const regexNonHttp = new RegExp(nonHttp)
-
-        if (url.match(regexNonHttp)) {
-            return true
-        } else if (url.match(regexHttp)) {
-            return true
-        } else {
-            return false
-        }
-    }
     // require path-to-regexp
     // helper function, iterates through the routes checking if the URL matches with one of our current roles
     const matchUrl = (sanitizedUrl) => {
@@ -124,8 +106,6 @@ const App = () => {
             const urlMatch = reg.match(path, {
                 decode: decodeURIComponent,
             })
-
-            console.log(urlMatch)
 
             const found = urlMatch(sanitizedUrl)
 
@@ -152,11 +132,10 @@ const App = () => {
 
     const serverHandler = async (req, res) => {
         const sanitizedUrl = sanitizeUrl(req.url, req.method)
-
         const match = matchUrl(sanitizedUrl)
 
-        if (match) {
-            const middlewaresAndControllers = routes.get(match)
+        if (match || req.method === "OPTIONS") {
+            const middlewaresAndControllers = match ? routes.get(match) : []
             // console.log(middlewaresAndControllers)
             // res.statusCode = 200
             // res.end("Found")
@@ -168,8 +147,8 @@ const App = () => {
                 ...middlewaresAndControllers,
             ])
         } else {
-            res.statusCode = 404
-            res.end("Not Found")
+            res.statusCode = 500
+            res.end("Server Error")
         }
     }
 

@@ -4,7 +4,6 @@ import Router from "./router.js"
 const PORT = process.env.PORT || 3500
 const app = App()
 const router = Router()
-
 const whitelist = [
     "http://localhost:3000",
     "http://localhost:3500",
@@ -12,7 +11,6 @@ const whitelist = [
 ]
 
 const credentials = (req, res, next) => {
-    console.log("credentials being used for all routes")
     const origin = req.headers.origin
     const auth = req.headers.authorization
     if (whitelist.includes(origin)) {
@@ -32,24 +30,11 @@ const credentials = (req, res, next) => {
 }
 
 const cors = (req, res, next) => {
-    console.log("CORS being used for all routes")
-    const origin = req.headers.origin
-
     const headers = {
         "Access-Control-Allow-Origin": "*", // check for security
         "Access-Control-Allow-Methods": "OPTIONS, POST, GET",
         "Access-Control-Allow-Headers": "Content-Type, Accept",
-        "Access-Control-Max-Age": 2592000, // Cache preflight response for 30 days
-    }
-
-    // Check if the request's origin is allowed
-    if (whitelist.indexOf(origin) !== -1 || !origin) {
-        headers["Access-Control-Allow-Origin"] = origin || "*" // Dynamically set the allowed origin
-    } else {
-        // If the origin is not in the whitelist, block the request
-        res.writeHead(405, { "Content-Type": "text/plain" })
-        res.end("CORS Error: Not allowed by CORS")
-        throw new Error("not allowed by CORS")
+        // "Access-Control-Max-Age": 2592000, // Cache preflight response for 30 days
     }
 
     // Handle preflight OPTIONS request
@@ -58,11 +43,20 @@ const cors = (req, res, next) => {
         res.end()
         return
     }
+    const origin = req.headers.origin
 
-    // res.writeHead(405, headers)
-    // res.end(`${req.method} is not allowed for the request`)
+    // Check if the request's origin is allowed
+    if (whitelist.indexOf(origin) !== -1 || !origin) {
+        headers["Access-Control-Allow-Origin"] = origin || "*" // Dynamically set the allowed origin
+    } else {
+        // If the origin is not in the whitelist, block the request
+        res.writeHead(403, { "Content-Type": "text/plain" })
+        res.end("CORS Error: Not allowed by CORS")
+        console.error("CORS Error: Not allowed by CORS")
+        return
+    }
 
-    // Set the headers for non-OPTIONS requests (e.g., GET, POST)
+    // Set the headers for non-OPTIONS requests (e.g., GET, POST) after cors has been dealt with
     res.setHeader(
         "Access-Control-Allow-Origin",
         headers["Access-Control-Allow-Origin"]
@@ -81,6 +75,8 @@ const cors = (req, res, next) => {
 
 app.useAll(cors)
 app.useAll(credentials) // inspect
+console.log("CORS being used for all routes")
+console.log("credentials being used for all routes")
 
 // first middleware function calls next once finished
 const mw1 = (req, res, next) => {
@@ -150,11 +146,7 @@ app.use("/admins", (req, res, next) => {
 })
 
 app.get("/", (req, res, next) => {
-    // res.end("Hello World")
-    // res.status(200)
-    // res.json("Hello World!")
-    res.end(JSON.stringify({ hello: "hello" }))
-    // res.end("Hello World!")
+    res.json("Hello World!") // this is better then res.end
     // console.log("") // this will print in terminal
 })
 
